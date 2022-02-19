@@ -1,6 +1,8 @@
 import collections
 import unittest
 
+import numpy as np
+
 from src.AutoCorrect import AutoCorrect
 
 
@@ -576,6 +578,101 @@ class AutoCorrectTest(unittest.TestCase):
             for index, elem in enumerate(sorted(result)):
                 self.assertEqual(True, elem[0] == sorted(test_case["expected"]["n_best"])[index][0])
                 self.assertEqual(True, abs(elem[1] - sorted(test_case["expected"]["n_best"])[index][1]) < .01)
+
+    def test_min_edit_distance(self):
+        auto_correct = AutoCorrect()
+        target = auto_correct.min_edit_distance
+        test_cases = [
+            {
+                "name": "default_check1",
+                "input": {
+                    "source": "play",
+                    "target": "stay",
+                    "ins_cost": 1,
+                    "del_cost": 1,
+                    "rep_cost": 2,
+                },
+                "expected": {
+                    "D": np.array(
+                        [
+                            [0, 1, 2, 3, 4],
+                            [1, 2, 3, 4, 5],
+                            [2, 3, 4, 5, 6],
+                            [3, 4, 5, 4, 5],
+                            [4, 5, 6, 5, 4],
+                        ]
+                    ),
+                    "med": 4,
+                },
+            },
+            {
+                "name": "default_check2",
+                "input": {
+                    "source": "eer",
+                    "target": "near",
+                    "ins_cost": 1,
+                    "del_cost": 1,
+                    "rep_cost": 2,
+                },
+                "expected": {
+                    "D": np.array(
+                        [[0, 1, 2, 3, 4], [1, 2, 1, 2, 3], [2, 3, 2, 3, 4], [3, 4, 3, 4, 3]]
+                    ),
+                    "med": 3,
+                },
+            },
+            {
+                "name": "nonmodified_costs_check",
+                "input": {
+                    "source": "star",
+                    "target": "stack",
+                    "ins_cost": 1,
+                    "del_cost": 1,
+                    "rep_cost": 2,
+                },
+                "expected": {
+                    "D": np.array(
+                        [
+                            [0, 1, 2, 3, 4, 5],
+                            [1, 0, 1, 2, 3, 4],
+                            [2, 1, 0, 1, 2, 3],
+                            [3, 2, 1, 0, 1, 2],
+                            [4, 3, 2, 1, 2, 3],
+                        ]
+                    ),
+                    "med": 3,
+                },
+            },
+            {
+                "name": "modified_costs_check",
+                "input": {
+                    "source": "star",
+                    "target": "stack",
+                    "ins_cost": 2,
+                    "del_cost": 2,
+                    "rep_cost": 3,
+                },
+                "expected": {
+                    "D": np.array(
+                        [
+                            [0, 2, 4, 6, 8, 10],
+                            [2, 0, 2, 4, 6, 8],
+                            [4, 2, 0, 2, 4, 6],
+                            [6, 4, 2, 0, 2, 4],
+                            [8, 6, 4, 2, 3, 5],
+                        ]
+                    ),
+                    "med": 5,
+                },
+            },
+        ]
+        for test_case in test_cases:
+            result = target(**test_case["input"])
+            self.assertEqual(True, isinstance(result[0], type(result[0])))
+            self.assertEqual(True, isinstance(result[1], type(result[1])))
+            self.assertEqual(True, result[0].shape == test_case["expected"]["D"].shape)
+            self.assertEqual(True, np.allclose(result[0], test_case["expected"]["D"]))
+            self.assertEqual(True, np.isclose(result[1], test_case["expected"]["med"]))
 
 if __name__ == '__main__':
     unittest.main()

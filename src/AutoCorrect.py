@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pandas as pd
 from numpy import unique
 
 
@@ -98,7 +99,17 @@ class AutoCorrect:
         return edit_words
 
     def min_edit_distance(self, source, target, ins_cost=1, del_cost=1, rep_cost=2):
-        pass
+        rows, columns = len(source), len(target)
+        distances = np.zeros((rows + 1, columns + 1), dtype=int)
+        for row in range(0, rows + 1):
+            distances[row, 0] = row * ins_cost
+        for column in range(0, columns + 1):
+            distances[0, column] = column * del_cost
+        for row in range(1, rows + 1):
+            for column in range(1, columns + 1):
+                r_cost = 0 if source[row - 1] == target[column - 1] else rep_cost
+                distances[row, column] = min(distances[row - 1, column - 1] + r_cost, distances[row - 1, column] + ins_cost, distances[row, column - 1] + del_cost)
+        return distances, distances[rows, columns]
 
 if __name__ == '__main__':
     auto_correct = AutoCorrect()
@@ -113,3 +124,4 @@ if __name__ == '__main__':
     auto_correct.edit_two_letters("at")
     auto_correct.edit_two_letters("at")
     auto_correct.get_corrections("dys", probs, vocab, 2, verbose=True)
+    auto_correct.min_edit_distance('star', 'stack', ins_cost=2, del_cost=2, rep_cost=3)
