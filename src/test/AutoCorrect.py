@@ -8,7 +8,16 @@ class AutoCorrectTest(unittest.TestCase):
     def test_process_data(self):
         auto_correct = AutoCorrect()
         target = auto_correct.process_data
-        test_cases = [ { "name": "default_check", "input": {"file_name": "/../../data/shakespeare.txt"}, "expected": { "expected_output_head": ["o", "for", "a", "muse", "of", "fire", "that", "would", "ascend", "the"], "expected_output_tail": [ "whilst", "you", "abide", "here", "enobarbus", "humbly", "sir", "i", "thank", "you"], "expected_n_words": 6209, }, } ]
+        test_cases = [
+            {
+                "name": "default_check", "input": {"file_name": "/../../data/shakespeare.txt"},
+                "expected": {
+                    "expected_output_head": ["o", "for", "a", "muse", "of", "fire", "that", "would", "ascend", "the"],
+                    "expected_output_tail": ['whilst', 'you', 'abide', 'here', 'enobarbus', 'humbly', 'sir', 'i', 'thank', 'you'],
+                    "expected_n_words": 6205,
+                },
+            }
+        ]
         for test_case in test_cases:
             result = target(**test_case["input"])
             self.assertEqual(result[:10], test_case["expected"]["expected_output_head"])
@@ -24,7 +33,7 @@ class AutoCorrectTest(unittest.TestCase):
                 "name": "default_check",
                 "input": {"word_l": word_l},
                 "expected": {
-                    "expected_key_value_pairs": 6209,
+                    "expected_key_value_pairs": 6205,
                     "expected_count_thee": 240,
                     "expected_count_esteemed": 3,
                     "expected_count_your": 397,
@@ -55,7 +64,7 @@ class AutoCorrectTest(unittest.TestCase):
             result = target(**test_case["input"])
             self.assertEqual(True, isinstance(result, collections.Counter) or isinstance(result, dict))
             self.assertEqual(len(result), test_case["expected"]["expected_key_value_pairs"])
-            self.assertEqual(True, result.get("thee", 0) == test_case["expected"]["expected_count_thee"])
+            self.assertEqual(result.get("thee", 0), test_case["expected"]["expected_count_thee"])
             self.assertEqual (True, result.get("esteemed", -1) == test_case["expected"]["expected_count_esteemed"])
             self.assertEqual(result.get("your", 0), test_case["expected"]["expected_count_your"])
 
@@ -69,7 +78,7 @@ class AutoCorrectTest(unittest.TestCase):
                 "name": "default_check",
                 "input": {"word_count_dict": word_count_dict},
                 "expected": {
-                    "expected_prob_length": 6209,
+                    "expected_prob_length": 6205,
                     "expected_prob_thee": 0.0045,
                     "expected_prob_esteemed": 0.0001,
                     "expected_prob_your": 0.0074,
@@ -359,6 +368,214 @@ class AutoCorrectTest(unittest.TestCase):
             self.assertEqual(True, isinstance(result, list))
             self.assertEqual(len(result), len(test_case["expected"]))
             self.assertEqual(sorted(result), sorted(test_case["expected"]))
+
+    def test_edit_one_letter(self):
+        auto_correct = AutoCorrect()
+        target = auto_correct.edit_one_letter
+        test_cases = [
+            {
+                "name": "default_check",
+                "input": {"word": "at"},
+                "expected": set(
+                    ['a', 'aa', 'aat', 'ab', 'abt', 'ac', 'act', 'ad', 'adt', 'ae', 'aet', 'af', 'aft', 'ag', 'agt', 'ah', 'aht', 'ai', 'ait', 'aj', 'ajt', 'ak', 'akt', 'al', 'alt', 'am', 'amt', 'an', 'ant', 'ao', 'aot', 'ap', 'apt', 'aq', 'aqt', 'ar', 'art', 'as', 'ast', 'att', 'au', 'aut', 'av', 'avt', 'aw', 'awt', 'ax', 'axt', 'ay', 'ayt', 'az', 'azt', 'bat', 'bt', 'cat', 'ct', 'dat', 'dt', 'eat', 'et', 'fat', 'ft', 'gat', 'gt', 'hat', 'ht', 'iat', 'it', 'jat', 'jt', 'kat', 'kt', 'lat', 'lt', 'mat', 'mt', 'nat', 'nt', 'oat', 'ot', 'pat', 'pt', 'qat', 'qt', 'rat', 'rt', 'sat', 'st', 't', 'ta', 'tat', 'tt', 'uat', 'ut', 'vat', 'vt', 'wat', 'wt', 'xat', 'xt', 'yat', 'yt', 'zat', 'zt']
+                ),
+            },
+            {
+                "name": "long_check",
+                "input": {"word": "can"},
+                "expected": set(
+                    ['aan', 'acan', 'acn', 'an', 'ban', 'bcan', 'ca', 'caa', 'caan', 'cab', 'cabn', 'cac', 'cacn', 'cad', 'cadn', 'cae', 'caen', 'caf', 'cafn', 'cag', 'cagn', 'cah', 'cahn', 'cai', 'cain', 'caj', 'cajn', 'cak', 'cakn', 'cal', 'caln', 'cam', 'camn', 'cann', 'cao', 'caon', 'cap', 'capn', 'caq', 'caqn', 'car', 'carn', 'cas', 'casn', 'cat', 'catn', 'cau', 'caun', 'cav', 'cavn', 'caw', 'cawn', 'cax', 'caxn', 'cay', 'cayn', 'caz', 'cazn', 'cban', 'cbn', 'ccan', 'ccn', 'cdan', 'cdn', 'cean', 'cen', 'cfan', 'cfn', 'cgan', 'cgn', 'chan', 'chn', 'cian', 'cin', 'cjan', 'cjn', 'ckan', 'ckn', 'clan', 'cln', 'cman', 'cmn', 'cn', 'cna', 'cnan', 'cnn', 'coan', 'con', 'cpan', 'cpn', 'cqan', 'cqn', 'cran', 'crn', 'csan', 'csn', 'ctan', 'ctn', 'cuan', 'cun', 'cvan', 'cvn', 'cwan', 'cwn', 'cxan', 'cxn', 'cyan', 'cyn', 'czan', 'czn', 'dan', 'dcan', 'ean', 'ecan', 'fan', 'fcan', 'gan', 'gcan', 'han', 'hcan', 'ian', 'ican', 'jan', 'jcan', 'kan', 'kcan', 'lan', 'lcan', 'man', 'mcan', 'nan', 'ncan', 'oan', 'ocan', 'pan', 'pcan', 'qan', 'qcan', 'ran', 'rcan', 'san', 'scan', 'tan', 'tcan', 'uan', 'ucan', 'van', 'vcan', 'wan', 'wcan', 'xan', 'xcan', 'yan', 'ycan', 'zan', 'zcan']
+                ),
+            },
+        ]
+        for test_case in test_cases:
+            result = target(**test_case["input"])
+            self.assertEqual(True, isinstance(result, set))
+            self.assertEqual(len(result), len(test_case["expected"]))
+            self.assertEqual(sorted(result), sorted(test_case["expected"]))
+
+    def test_edit_two_letters(self):
+        auto_correct = AutoCorrect()
+        target = auto_correct.edit_two_letters
+        test_cases = [
+            {
+                "name": "default_check1",
+                "input": {"word": "a"},
+                "expected": {
+                    "expected_n_words_edit_dist": 1379,
+                    "expected_head": ['', 'a', 'aa', 'aaa', 'ab', 'aba', 'ac', 'aca', 'ad', 'ada'],
+                    "expected_tail": [
+                        "zv",
+                        "zva",
+                        "zw",
+                        "zwa",
+                        "zx",
+                        "zxa",
+                        "zy",
+                        "zya",
+                        "zz",
+                        "zza",
+                    ],
+                },
+            },
+            {
+                "name": "default_check2",
+                "input": {"word": "at"},
+                "expected": {
+                    "expected_n_words_edit_dist": 4654,
+                    "expected_head": ['', 'a', 'aa', 'aaa', 'aaat', 'aab', 'aabt', 'aac', 'aact', 'aad'],
+                    "expected_tail": [
+                        "zwt",
+                        "zx",
+                        "zxat",
+                        "zxt",
+                        "zy",
+                        "zyat",
+                        "zyt",
+                        "zz",
+                        "zzat",
+                        "zzt",
+                    ],
+                },
+            },
+            {
+                "name": "switches_check",
+                "input": {"word": "at", "allow_switches": False},
+                "expected": {
+                    "expected_n_words_edit_dist": 4654,
+                    "expected_head": ['', 'a', 'aa', 'aaa', 'aaat', 'aab', 'aabt', 'aac', 'aact', 'aad'],
+                    "expected_tail": [
+                        "zwt",
+                        "zx",
+                        "zxat",
+                        "zxt",
+                        "zy",
+                        "zyat",
+                        "zyt",
+                        "zz",
+                        "zzat",
+                        "zzt",
+                    ],
+                },
+            },
+            {
+                "name": "long_check_no_switch",
+                "input": {"word": "cat", "allow_switches": False},
+                "expected": {
+                    "expected_n_words_edit_dist": 10555,
+                    "expected_head": [
+                        "a",
+                        "aa",
+                        "aaa",
+                        "aaat",
+                        "aab",
+                        "aabt",
+                        "aac",
+                        "aacat",
+                        "aact",
+                        "aad",
+                    ],
+                    "expected_tail": [
+                        "zwt",
+                        "zxat",
+                        "zxcat",
+                        "zxt",
+                        "zyat",
+                        "zycat",
+                        "zyt",
+                        "zzat",
+                        "zzcat",
+                        "zzt",
+                    ],
+                },
+            },
+            {
+                "name": "long_check_no_switch",
+                "input": {"word": "cat"},
+                "expected": {
+                    "expected_n_words_edit_dist": 10555,
+                    "expected_head": [
+                        "a",
+                        "aa",
+                        "aaa",
+                        "aaat",
+                        "aab",
+                        "aabt",
+                        "aac",
+                        "aacat",
+                        "aact",
+                        "aad",
+                    ],
+                    "expected_tail": [
+                        "zwt",
+                        "zxat",
+                        "zxcat",
+                        "zxt",
+                        "zyat",
+                        "zycat",
+                        "zyt",
+                        "zzat",
+                        "zzcat",
+                        "zzt",
+                    ],
+                },
+            },
+        ]
+        for test_case in test_cases:
+            result = target(**test_case["input"])
+            self.assertEqual(True, isinstance(result, set))
+            self.assertEqual(len(result), test_case["expected"]["expected_n_words_edit_dist"])
+            self.assertEqual(sorted(list(result))[:10], sorted(test_case["expected"]["expected_head"]))
+            self.assertEqual(sorted(list(result))[-10:], sorted(test_case["expected"]["expected_tail"]))
+
+    def test_get_corrections(self):
+        auto_correct = AutoCorrect()
+        target = auto_correct.get_corrections
+        vocab = auto_correct.process_data('/../../data/shakespeare.txt')
+        word_count_dict = auto_correct.get_count(vocab)
+        probs = auto_correct.get_probs(word_count_dict)
+        test_cases = [
+            {
+                "name": "default_check",
+                "input": {"word": "dys", "probs": probs, "vocab": vocab, "n": 2},
+                "expected": {
+                    "n_best": [
+                        ("days", 0.0004103405826836274),
+                        ("dye", 1.865184466743761e-5),
+                    ]
+                },
+            },
+            {
+                "name": "default_check",
+                "input": {"word": "satr", "probs": probs, "vocab": vocab, "n": 2},
+                "expected": {
+                    "n_best": [
+                        ("star", 0.00013056291267206328),
+                        ("sat", 5.595553400231283e-05),
+                    ]
+                },
+            },
+            {
+                "name": "default_check",
+                "input": {"word": "san", "probs": probs, "vocab": vocab, "n": 5},
+                "expected": {
+                    "n_best": [
+                        ("say", 0.0019770955347483865),
+                        ("can", 0.0019211400007460738),
+                        ("an", 0.0017719252434065728),
+                        ("man", 0.0013242809713880702),
+                        ("son", 0.0007274219420300668),
+                    ]
+                },
+            },
+        ]
+        for test_case in test_cases:
+            result = target(**test_case["input"])
+            self.assertEqual(True, isinstance(result, list))
+            self.assertEqual(True, len(result) == len(test_case["expected"]["n_best"]))
+            for index, elem in enumerate(sorted(result)):
+                self.assertEqual(True, elem[0] == sorted(test_case["expected"]["n_best"])[index][0])
+                self.assertEqual(True, abs(elem[1] - sorted(test_case["expected"]["n_best"])[index][1]) < .01)
 
 if __name__ == '__main__':
     unittest.main()
