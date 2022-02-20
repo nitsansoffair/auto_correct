@@ -59,7 +59,7 @@ class AutoCorrect:
     def insert_letter(self, word, verbose=False):
         letters = 'abcdefghijklmnopqrstuvwxyz'
         insert_l = []
-        for index in range(len(word)):
+        for index in range(len(word) + 1):
             for letter in letters:
                 insert_l.append(word[:index] + letter + word[index:])
         return insert_l
