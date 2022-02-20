@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-import pandas as pd
 from numpy import unique
 
 
@@ -96,7 +95,7 @@ class AutoCorrect:
             edit_word, edit_word_prob = list(edit_probs_total.keys())[index], list(edit_probs_total.values())[index]
             if edit_word_prob in max_probs:
                 edit_words.append((edit_word, edit_word_prob))
-        return edit_words
+        return sorted(edit_words, key=lambda edit_tuple: edit_tuple[1], reverse=True)
 
     def min_edit_distance(self, source, target, ins_cost=1, del_cost=1, rep_cost=2):
         rows, columns = len(source), len(target)
