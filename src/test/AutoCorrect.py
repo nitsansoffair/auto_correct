@@ -961,7 +961,7 @@ class AutoCorrectTest(unittest.TestCase):
                 "name": "switches_check",
                 "input": {"word": "at", "allow_switches": False},
                 "expected": {
-                    "expected_n_words_edit_dist": 7130,
+                    "expected_n_words_edit_dist": 7154,
                     "expected_head": [
                         "",
                         "a",
@@ -992,7 +992,7 @@ class AutoCorrectTest(unittest.TestCase):
                 "name": "long_check_no_switch",
                 "input": {"word": "cat", "allow_switches": False},
                 "expected": {
-                    "expected_n_words_edit_dist": 14206,
+                    "expected_n_words_edit_dist": 14352,
                     "expected_head": [
                         "a",
                         "aa",
