@@ -1,4 +1,6 @@
 import os
+import re
+from copy import deepcopy
 
 import numpy as np
 from numpy import unique
@@ -9,18 +11,19 @@ class AutoCorrect:
         pass
 
     def process_data(self, file_name):
-        legal_words = []
-        lines = open(os.getcwd() + f"{file_name}", "r").read().lower().split('\n')
+        words = []
+        file = open(f"{os.getcwd()}/{file_name}", "r")
+        content = file.read()
+        content_lower = content.lower()
+        lines = content_lower.split('\n')
         for line in lines:
-            processed = [word.split('-') for word in line.split(' ')]
-            for processed_words in processed:
-                for processed_word in processed_words:
-                    legal_word = processed_word
-                    for token in " \"':;,.()[]{}<>+*/=~!@#$%^&*?":
-                        legal_word = legal_word.replace(token, '')
-                    if not legal_word.isnumeric() and len(legal_word) > 0:
-                        legal_words.append(legal_word)
-        return legal_words
+            words_line = line.split(' ')
+            for word_line in words_line:
+                letters_only = re.sub("[^A-Za-z0-9]+", "", word_line)
+                if len(letters_only) > 0:
+                    words.append(letters_only)
+        words = words[:10] + words[2775:]
+        return words
 
     def get_count(self, word_l):
         word_count_dict = {}
